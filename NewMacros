@@ -1,0 +1,41 @@
+Attribute VB_Name = "NewMacros"
+Sub ExportModules()
+   Dim proj As VBProject, vbc As VBComponent
+   Dim s As String
+   
+    pth = "d:\dok\word\makros\"
+   For Each vbc In VBE.VBProjects("Normal").VBComponents
+      If vbc.Name <> "ThisDocument" Then
+       vbc.Export pth + vbc.Name
+      End If
+   Next vbc
+   
+'   Open pth + "module.txt" For Binary Access Write As #1
+'
+'
+'   For Each vbc In VBE.VBProjects("Normal").VBComponents
+'      If vbc.Name <> "ThisDocument" Then
+'         Open pth + vbc.Name For Binary Access Read As #2
+'            s = Space(FileLen(pth + vbc.Name))
+'            hdr = "##############################" + vbc.Name + vbCr
+'            Get #2, , s
+'            Put #1, , hdr + s
+'         Close #2
+'      End If
+'   Next vbc
+'   Close #1
+'End Sub
+'
+'Sub LTF()
+'
+'    Dim StrFile As String
+'    'Debug.Print "in LoopThroughFiles. inputDirectoryToScanForFile: ", inputDirectoryToScanForFile
+'
+'    StrFile = Dir("z:\modules" & "\*" & filenameCriteria)
+'    Do While Len(StrFile) > 0
+'        Debug.Print StrFile
+'        StrFile = Dir
+'
+'    Loop
+'
+End Sub
