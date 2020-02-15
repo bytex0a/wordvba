@@ -1,9 +1,9 @@
-Attribute VB_Name = "NewMacros"
+Attribute VB_Name = "ModulOp"
+Global Const MODULE_PATH = "D:\dok\word\makros\"
+
 Sub ExportModules()
    Dim proj As VBProject, vbc As VBComponent
    Dim s, szFileName As String
-   
-    pth = "d:\dok\word\makros\"
    For Each vbc In VBE.VBProjects("Normal").VBComponents
       If vbc.Name <> "ThisDocument" Then
       szFileName = vbc.Name
@@ -16,17 +16,15 @@ Sub ExportModules()
                 szFileName = szFileName & ".bas"
             Case vbext_ct_Document
       End Select
-      vbc.Export pth + szFileName
+      vbc.Export MODULE_PATH + szFileName
       End If
    Next vbc
 End Sub
 
-Sub LTF()
-
+Sub ImportModules()
     Dim StrFile As String
-    'Debug.Print "in LoopThroughFiles. inputDirectoryToScanForFile: ", inputDirectoryToScanForFile
     Dim proj As VBProject, vbc As VBComponent
-    StrFile = Dir("d:\dok\word\makros\*.*")
+    StrFile = Dir(MODULE_PATH & "*.*")
     Do While Len(StrFile) > 0
         VBE.VBProjects("Project").VBComponents.Import StrFile
         Debug.Print StrFile
@@ -34,7 +32,7 @@ Sub LTF()
     Loop
 End Sub
 
-Sub Modullöschen()
+Sub DeleteModules()
    Dim i As Integer
    Dim sName As String
    For i = 1 To VBE.VBProjects("Project").VBComponents.Count
