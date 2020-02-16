@@ -26,32 +26,15 @@ Sub Smallcaps()
 End Sub
 
 Sub Randnummern_Erstellen()
-   Dim par As Paragraph, rzp As Paragraph
-   Dim rng As Range
-   Dim Selrng As Range
-   Dim undo As UndoRecord
-   Set undo = Application.UndoRecord
-   undo.StartCustomRecord ("Randnummern")
-   Dim frm As Frame, ate As AutoTextEntry
-   Set Selrng = Selection.Range
-   For Each par In Selrng.Paragraphs
-      Set rng = par.Range
-      rng.Select
-      rng.Collapse wdCollapseStart
-      rng.InsertBefore "Rz "
-      rng.InsertAutoText
-   Next par
-   undo.EndCustomRecord
-End Sub
-
-Sub RemoveNumberLines()
    Dim p As Paragraph
+   Dim rng As Range
    Dim objUndo As UndoRecord
    Set objUndo = Application.UndoRecord
    objUndo.StartCustomRecord ("Undo")
+   RegisterListtemplateRZ 'ListTemplate für Randziffern erstellen
    Application.ScreenUpdating = False
-   
-   For Each p In ActiveDocument.Paragraphs
+   If Selection.Paragraphs.Count = 1 Then Set rng = ActiveDocument.Range Else Set rng = Selection.Range
+   For Each p In rng.Paragraphs
       'If RxTest(p.Range.Text, "^\d+\r")   Then p.Range.Delete
       p.Range.Select
       Selection.Collapse wdCollapseStart
@@ -64,7 +47,36 @@ Sub RemoveNumberLines()
    objUndo.EndCustomRecord
 End Sub
 
-Sub ShowKeyForm()
-   KeyForm.Show
+Sub Randnummern_Loeschen()
+     Dim p As Paragraph
+     Dim fr As Frame
+   Dim objUndo As UndoRecord
+   Set objUndo = Application.UndoRecord
+   objUndo.StartCustomRecord ("Undo Remove Marginals")
+   Application.ScreenUpdating = False
+   For Each fr In ActiveDocument.Frames
+      If fr.Range.Paragraphs(1).Style = "Rz" Then
+         fr.Select
+         Selection.Delete
+      End If
+   Next fr
+   Application.ScreenUpdating = True
+   
+   objUndo.EndCustomRecord
 End Sub
 
+Sub DeleteUnusedStyles()
+    Dim oStyle As Style
+
+    For Each oStyle In ActiveDocument.Styles
+        'Only check out non-built-in styles
+        If oStyle.BuiltIn = False Then
+            With ActiveDocument.Content.Find
+                .ClearFormatting
+                .Style = oStyle.NameLocal
+                .Execute FindText:="", Format:=True
+                If .Found = False Then oStyle.Delete
+            End With
+        End If
+    Next oStyle
+End Sub

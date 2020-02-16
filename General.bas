@@ -153,53 +153,32 @@ Sub RegisterHotkeys()
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyK, KeyCategory:=wdKeyCategoryCommand, Command:="Kommandos"
 End Sub
 
-'******************** Module bearbeiten ********************
-Sub ExportModules()
-   Dim proj As VBProject, vbc As VBComponent
-   Dim s As String, szFileName As String, pth As String
-   pth = "d:\dok\word\makros\"
-   For Each vbc In VBE.VBProjects("Normal").VBComponents
-      If vbc.Name <> "ThisDocument" Then
-      szFileName = vbc.Name
-      Select Case vbc.Type
-            Case vbext_ct_ClassModule
-                szFileName = szFileName & ".cls"
-            Case vbext_ct_MSForm
-                szFileName = szFileName & ".frm"
-            Case vbext_ct_StdModule
-                szFileName = szFileName & ".bas"
-            Case vbext_ct_Document
-      End Select
-      vbc.Export pth + szFileName
-      End If
-   Next vbc
+'******************** ListTemplate Functions ********************
+
+Public Function ListTemplateIndex(ListTemplateName As String, _
+  Source As Word.Document) As ListTemplate
+  Dim lt As ListTemplate
+  
+  For Each lt In Source.ListTemplates
+    If lt.Name = ListTemplateName Then
+      Set ListTemplateIndex = lt
+      Exit For
+    End If
+  Next
+ 
+  If ListTemplateIndex Is Nothing Then
+    '"True" bedeutet, ListTemplate hat neun Ebenen
+    Set ListTemplateIndex = Source.ListTemplates.Add(True)
+    ListTemplateIndex.Name = ListTemplateName
+  End If
+  Set lt = Nothing
+End Function
+
+Sub RegisterListtemplateRZ()
+   Dim lt As ListTemplate
+   Set lt = ListTemplateIndex("RzList", ActiveDocument)
+   With lt.ListLevels(1)
+      .NumberFormat = "%1"
+      .TextPosition = CentimetersToPoints(1)
+   End With
 End Sub
-
-Sub ImportModules()
-
-    Dim StrFile As String
-    'Debug.Print "in LoopThroughFiles. inputDirectoryToScanForFile: ", inputDirectoryToScanForFile
-    Dim proj As VBProject, vbc As VBComponent
-    StrFile = Dir("d:\dok\word\makros\*.*")
-    Do While Len(StrFile) > 0
-        VBE.VBProjects("Project").VBComponents.Import StrFile
-        Debug.Print StrFile
-        StrFile = Dir
-    Loop
-End Sub
-
-Sub DeleteModules()
-   Dim i As Integer
-   Dim sName As String
-   For i = 1 To VBE.VBProjects("Project").VBComponents.Count
-   sName = VBE.VBProjects("Project").VBComponents.Item(i).Name
-   If sName <> "ThisDocument" Then
-     With VBE.VBProjects("Project").VBComponents
-         .Remove .Item(sName)
-     End With
-    Exit For
-   End If
-   Next i
-End Sub
-
-

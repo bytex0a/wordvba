@@ -22,20 +22,23 @@ Sub ExportModules()
 End Sub
 
 Sub ImportModules()
-    Dim StrFile As String
-    Dim proj As VBProject, vbc As VBComponent
-    StrFile = Dir(MODULE_PATH & "*.*")
-    Do While Len(StrFile) > 0
-        VBE.VBProjects("Project").VBComponents.Import StrFile
-        Debug.Print StrFile
-        StrFile = Dir
-    Loop
+   Const PROJECT_NAME = "Project"
+   Dim StrFile As String
+   Dim proj As VBProject, vbc As VBComponent
+   On Error Resume Next
+   StrFile = Dir(MODULE_PATH & "*.*")
+   Do While Len(StrFile) > 0
+       VBE.VBProjects(PROJECT_NAME).VBComponents.Import MODULE_PATH & StrFile
+       Debug.Print StrFile
+       StrFile = Dir
+   Loop
 End Sub
 
 Sub DeleteModules()
+   Const PROJECT_NAME = "Project"
    Dim i As Integer
    Dim sName As String
-   For i = 1 To VBE.VBProjects("Project").VBComponents.Count
+   For i = 1 To VBE.VBProjects(PROJECT_NAME).VBComponents.Count
    sName = VBE.VBProjects("Project").VBComponents.Item(i).Name
    If sName <> "ThisDocument" Then
      With VBE.VBProjects("Project").VBComponents
