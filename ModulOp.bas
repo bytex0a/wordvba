@@ -28,7 +28,7 @@ Sub ImportModules()
    On Error Resume Next
    StrFile = Dir(MODULE_PATH & "*.*")
    Do While Len(StrFile) > 0
-       VBE.VBProjects(PROJECT_NAME).VBComponents.Import MODULE_PATH & StrFile
+       If Right(StrFile, 3) <> "frx" Then VBE.VBProjects(PROJECT_NAME).VBComponents.Import MODULE_PATH & StrFile
        Debug.Print StrFile
        StrFile = Dir
    Loop
