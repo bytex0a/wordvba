@@ -1,5 +1,6 @@
 Attribute VB_Name = "ModulOp"
 Global Const MODULE_PATH = "D:\dok\word\makros\"
+'Global Const MODULE_PATH = "U:\Dokumente\Sonstiges\Word"
 
 Sub ExportModules()
    Dim proj As VBProject, vbc As VBComponent
@@ -39,9 +40,9 @@ Sub DeleteModules()
    Dim i As Integer
    Dim sName As String
    For i = 1 To VBE.VBProjects(PROJECT_NAME).VBComponents.Count
-   sName = VBE.VBProjects("Project").VBComponents.Item(i).Name
+   sName = VBE.VBProjects(PROJECT_NAME).VBComponents.Item(i).Name
    If sName <> "ThisDocument" Then
-     With VBE.VBProjects("Project").VBComponents
+     With VBE.VBProjects(PROJECT_NAME).VBComponents
          .Remove .Item(sName)
      End With
     Exit For

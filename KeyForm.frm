@@ -43,8 +43,10 @@ Private Sub UserForm_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift A
       If KeyCode = vbKeyBack Then Selection.Paragraphs(1).TabStops(pos).Clear: KeyForm.Hide
    End If
    
-   If KeyCode = vbKeySpace Then BuildDatabase: KeyForm.Hide
-   
+   If KeyCode = vbKeySpace Then
+      KeyForm.Hide
+      BuildDatabase
+   End If
    pressed = 1 - pressed
    oldkey = KeyCode
    If KeyCode = 27 Then KeyForm.Hide

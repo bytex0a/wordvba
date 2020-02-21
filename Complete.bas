@@ -1,4 +1,5 @@
 Attribute VB_Name = "Complete"
+Public Declare PtrSafe Function GetTickCount Lib "kernel32.dll" () As Long
 Option Explicit
 Const ADD_SPACE = ""
 Public dict As Object
@@ -6,21 +7,31 @@ Public resultdict As Object
 
 Sub BuildDatabase()
    Dim max As Long, i As Long, wort As String
+   Dim wrng As Range, t1 As Long, t2 As Long
+   t1 = GetTickCount
+   StatusBar = "Rebuild Database..."
    Set dict = CreateObject("Scripting.Dictionary")
    Set resultdict = CreateObject("Scripting.Dictionary")
-   max = ActiveDocument.Words.Count
-   For i = 1 To max
-       wort = Trim(ActiveDocument.Words(i))
-       If (Len(wort) > 2) Then
+   For Each wrng In ActiveDocument.Words
+   wort = wrng.Text
+   If Len(wort) < 3 Then GoTo NextContinue
+   If InStr(wort, " ") > 0 Then wort = Trim(wrng.Text)
+   If (Len(wort) > 2) Then
           If Not dict.Exists(wort) Then dict.Add wort, i
        End If
-   Next i
+       i = i + 1
+NextContinue:
+   Next wrng
+   StatusBar = "Database rebuilt in " & (GetTickCount - t1) & " ms"
 End Sub
 
 Sub CheckWord()
     Dim i As Long, wort As String, Item As Variant, a
     CompleteForm.ListBox1.Clear
-    If dict Is Nothing Then BuildDatabase
+    If dict Is Nothing Then
+       BuildDatabase
+    ElseIf ActiveDocument.Words.Count < 5000 Then BuildDatabase
+    End If
     resultdict.RemoveAll
     Selection.MoveLeft Unit:=wdCharacter, Count:=1
     wort = Selection.Words(1)
