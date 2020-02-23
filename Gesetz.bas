@@ -16,7 +16,7 @@ End Sub
 
 '******************** Gesetz Routinen ********************
 Sub ErstelleStyles()
-   Dim st As Style
+   Dim st As style
    On Error Resume Next
    st = ActiveDocument.Styles.Add("G_Absatz", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_Num1", wdStyleTypeParagraph)
@@ -103,7 +103,7 @@ Sub LoopPara()
       pat = "^(\d+[a-z]*.)\r"
       If RxTest(str, pat) Then
          par.Range = RxReplace(str, pat, "$1" & vbTab)
-         par.Style = "G_Num1"
+         par.style = "G_Num1"
       End If
       
       'Numerierung a) b) c)
@@ -111,26 +111,26 @@ Sub LoopPara()
       If RxTest(str, pat) Then
          rpls = RxReplace(str, pat, "$1" & vbTab)
          par.Range.Text = rpls
-         par.Style = "G_Num2"
+         par.style = "G_Num2"
       End If
       
       'Numerierung aa) bb) cc)
       pat = "^([a-z]{2}\))\r"
       If RxTest(str, pat) Then
          par.Range.Text = RxReplace(str, pat, "$1" & vbTab)
-         par.Style = "G_Num3"
+         par.style = "G_Num3"
       End If
       
       'Absätze
       pat = "^\(\d+[a-z]*\)"
       If RxTest(str, pat) Then
-         par.Style = "G_Para"
+         par.style = "G_Para"
       End If
       
       'Paragrafen-Überschriften
       pat = "^§ \d+[a-z]*[" & ChrW(160) & " ][A-Z\(]"
       If RxTest(str, pat) Then
-         par.Style = "G_ÜPara"
+         par.style = "G_ÜPara"
          par.KeepWithNext = True
       End If
       
@@ -144,37 +144,37 @@ Sub LoopPara()
       'Artikel-Überschriften
       pat = "^Art\. .*$"
       If RxTest(str, pat) Then
-         par.Style = "G_ÜPara"
+         par.style = "G_ÜPara"
          par.KeepWithNext = True
       End If
       
       'Gliederung Teil
-      If RxTest(str, "^Art. \d+" & vbCr & "$") Then par.Range.Text = RxReplace(str, vbCr, Chr(11)): par.Style = "G_Para"
-      If RxTest(str, "^Teil \d+" & vbCr & "$") Then par.Range.Text = RxReplace(str, vbCr, Chr(11)): par.Style = "G_ÜTeil"
+      If RxTest(str, "^Art. \d+" & vbCr & "$") Then par.Range.Text = RxReplace(str, vbCr, Chr(11)): par.style = "G_Para"
+      If RxTest(str, "^Teil \d+" & vbCr & "$") Then par.Range.Text = RxReplace(str, vbCr, Chr(11)): par.style = "G_ÜTeil"
       If RxTest(str, "^[A-Z][a-z]+ Teil ") Then
          par.Range.Text = RxReplace(str, "^([A-Z][a-z]+ Teil)", "$1" & Chr(11))
          Set par = par.Previous
-         par.Style = "G_ÜTeil"
+         par.style = "G_ÜTeil"
       End If
-      If RxTest(str, "^[A-Z][a-z]+ Teil" & Chr(11)) Then par.Style = "G_ÜTeil"
-      If RxTest(str, "^[A-Z][a-z]+ Abschnitt" & Chr(11)) Then par.Style = "G_ÜAbschnitt"
-      If RxTest(str, "^Abschnitt \d+" & vbCr & "$") Then par.Range.Text = RxReplace(str, vbCr, Chr(11)): par.Style = "G_ÜAbschnitt"
+      If RxTest(str, "^[A-Z][a-z]+ Teil" & Chr(11)) Then par.style = "G_ÜTeil"
+      If RxTest(str, "^[A-Z][a-z]+ Abschnitt" & Chr(11)) Then par.style = "G_ÜAbschnitt"
+      If RxTest(str, "^Abschnitt \d+" & vbCr & "$") Then par.Range.Text = RxReplace(str, vbCr, Chr(11)): par.style = "G_ÜAbschnitt"
       If RxTest(str, "^(Abschnitt I+) (.*)") Then
          par.Range.Text = RxReplace(str, "(^Abschnitt I+) ", "$1" & Chr(11))
          Set par = par.Previous
-         par.Style = "G_ÜAbschnitt"
+         par.style = "G_ÜAbschnitt"
       End If
-      If RxTest(str, "^Anlage \d+") Then par.Style = "G_ÜPara"
+      If RxTest(str, "^Anlage \d+") Then par.style = "G_ÜPara"
       
       'Text nach Paragrafen/Überschriften
       On Error Resume Next
       Set ppar = par.Previous
-      prevsty = ppar.Style
-      parsty = par.Style
+      prevsty = ppar.style
+      parsty = par.style
       If (parsty = "Standard") And _
                                ((InStr(prevsty, "G_Num") = 1) Or _
                                 (InStr(prevsty, "G_Para") = 1)) Then
-         par.Style = "G_FolgeText"
+         par.style = "G_FolgeText"
       End If
    Next par
    objUndo.EndCustomRecord

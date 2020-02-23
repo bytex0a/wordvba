@@ -17,7 +17,7 @@ Sub PrAst(str As String)
    Debug.Print ("*" & str & "*")
 End Sub
 
-Sub PrD(str As String)
+Sub PrBy(str As String)
    Dim bytes() As Byte
    bytes = StrConv(str, vbFromUnicode)
    output = ""
@@ -52,7 +52,7 @@ Sub SearchReplace(fe, re, sty As String)
       .Text = fe
       .Replacement.ClearFormatting
       .Format = True
-      .Replacement.Style = ActiveDocument.Styles(sty)
+      .Replacement.style = ActiveDocument.Styles(sty)
       .Replacement.Text = re
       .Execute Replace:=wdReplaceAll, Forward:=True, Wrap:=wdFindContinue
    End With
@@ -179,6 +179,7 @@ Sub RegisterHotkeys()
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyL, KeyCategory:=wdKeyCategoryCommand, Command:="BefehllisteAnzeigen"
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyD, KeyCategory:=wdKeyCategoryCommand, Command:="DlgAufrufen"
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyK, KeyCategory:=wdKeyCategoryCommand, Command:="Kommandos"
+    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyE, KeyCategory:=wdKeyCategoryCommand, Command:="LoopEdit"
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeySpacebar), KeyCategory:=wdKeyCategoryCommand, Command:="CheckWord"
 End Sub
 
@@ -211,3 +212,4 @@ Sub RegisterListtemplateRZ()
       .TextPosition = CentimetersToPoints(1)
    End With
 End Sub
+

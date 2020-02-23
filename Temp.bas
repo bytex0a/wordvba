@@ -1,32 +1,4 @@
 Attribute VB_Name = "Temp"
-Sub PrAst(str As String)
-   Debug.Print ("*" & str & "*")
-End Sub
-
-Sub PrBy(str As String)
-   Dim bytes() As Byte
-   bytes = StrConv(str, vbFromUnicode)
-   output = ""
-   For i = 0 To UBound(bytes)
-      output = output & " " & CStr(bytes(i))
-   Next i
-   Debug.Print output
-End Sub
-
-Sub PrH(str As String)
-   Dim bytes() As Byte
-   bytes = StrConv(str, vbFromUnicode)
-   output = ""
-   For i = 0 To UBound(bytes)
-      If Len(CStr(Hex(bytes(i)))) = 1 Then
-         output = output & " 0" & CStr(Hex(bytes(i)))
-      Else: output = output & " " & CStr(Hex(bytes(i)))
-      End If
-   Next i
-   Debug.Print output
-End Sub
-
-
 Sub SucheinDatei()
    Const FILE_NAME = "z:\vbaProject.bin"
    Dim dat As Integer
@@ -70,3 +42,4 @@ Sub testsubarr()
    h = SubArray(g, 3, 5)
    Pr StrConv(h, vbUnicode)
 End Sub
+
