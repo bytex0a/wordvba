@@ -13,6 +13,34 @@ Function Pr(s As Variant)                        'Shortcut for Debug.Print
    Debug.Print s
 End Function
 
+Sub PrAst(str As String)
+   Debug.Print ("*" & str & "*")
+End Sub
+
+Sub PrD(str As String)
+   Dim bytes() As Byte
+   bytes = StrConv(str, vbFromUnicode)
+   output = ""
+   For i = 0 To UBound(bytes)
+      output = output & " " & CStr(bytes(i))
+   Next i
+   Debug.Print output
+End Sub
+
+Sub PrH(str As String)
+   Dim bytes() As Byte
+   bytes = StrConv(str, vbFromUnicode)
+   output = ""
+   For i = 0 To UBound(bytes)
+      If Len(CStr(Hex(bytes(i)))) = 1 Then
+         output = output & " 0" & CStr(Hex(bytes(i)))
+      Else: output = output & " " & CStr(Hex(bytes(i)))
+      End If
+   Next i
+   Debug.Print output
+End Sub
+
+
 Sub Inc(ByRef ival): ival = ival + 1: End Sub
 Sub Dec(ByRef ival): ival = ival - 1: End Sub
 
