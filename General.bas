@@ -149,9 +149,20 @@ Sub DlgAufrufen()
    End If
 End Sub
 
+Function GetPoints(ca() As String) As Single
+   If UBound(ca) = 2 Then If ca(2) = "cm" Then GetPoints = CentimetersToPoints(ca(1))
+   If UBound(ca) = 1 Then GetPoints = CInt(ca(1))
+End Function
+
+Function GetLinePoints(ca() As String) As Single
+   If UBound(ca) = 2 Then If ca(2) = "cm" Then GetLinePoints = CentimetersToPoints(ca(1))
+   If UBound(ca) = 1 Then GetLinePoints = (CInt(ca(1)))
+End Function
+
 Sub Kommandos()
-   Dim com, s As String
+   Dim com, s As String, sp As Integer, par As Paragraph, comarr() As String
    com = InputBox("Kommando eingeben", "Komanndo")
+   If InStr(com, " ") = 0 Then
    Select Case com
    Case "hp":
       s = "Horizontale Position : " & vbCr & Round(Application.Selection.Information(wdHorizontalPositionRelativeToTextBoundary) _
@@ -160,8 +171,18 @@ Sub Kommandos()
                                                    / 72 * 2.54, 2) & "cm / " & Application.Selection.Information(wdHorizontalPositionRelativeToPage) & "pt. (relative to Page)"
       MsgBox s
    Case "rds": Application.Run ("RedefineStyle")
-      
    End Select
+   Else
+      comarr = Split(com)
+      Select Case comarr(0)
+      Case "ctp": MsgBox (CentimetersToPoints(CSng(comarr(1))) & " pt.")
+      Case "ptc": MsgBox (PointsToCentimeters(CSng(comarr(1))) & " cm")
+      Case "pa": For Each par In Selection.Paragraphs: par.SpaceAfter = GetPoints(comarr): Next
+      Case "pb": For Each par In Selection.Paragraphs: par.SpaceBefore = GetPoints(comarr): Next
+      Case "pse": For Each par In Selection.Paragraphs: par.LineSpacingRule = wdLineSpaceExactly: par.LineSpacing = GetLinePoints(comarr): Next
+      Case "psm": For Each par In Selection.Paragraphs: par.LineSpacingRule = wdLineSpaceMultiple: par.LineSpacing = LinesToPoints((CSng(comarr(1)))): Next
+      End Select
+   End If
 End Sub
 
 Sub BefehllisteAnzeigen()

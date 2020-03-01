@@ -1,7 +1,7 @@
 Attribute VB_Name = "Complete"
 Public Declare PtrSafe Function GetTickCount Lib "kernel32.dll" () As Long
 Option Explicit
-Const ADD_SPACE = ""
+Global Const ADD_SPACE = " "
 Public dict As Object
 Public resultdict As Object
 

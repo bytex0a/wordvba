@@ -1,3 +1,4 @@
+Attribute VB_Name = "Temp"
 Option Explicit
  
 Private EncodeArr(64) As String * 1
@@ -121,3 +122,4 @@ Sub TestBase64()
    Close #1
    
 End Sub
+
