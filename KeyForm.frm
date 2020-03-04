@@ -21,10 +21,6 @@ Function CheckKey(coldkey, ckey) As Boolean
    If (key = ckey) And (oldkey = coldkey) Then CheckKey = True Else CheckKey = False
 End Function
 
-Private Sub Label1_Click()
-
-End Sub
-
 Private Sub UserForm_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
    key = KeyCode
     Label1.Caption = key & "  " & oldkey

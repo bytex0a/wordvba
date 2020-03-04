@@ -201,6 +201,7 @@ Sub RegisterHotkeys()
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyD, KeyCategory:=wdKeyCategoryCommand, Command:="DlgAufrufen"
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyK, KeyCategory:=wdKeyCategoryCommand, Command:="Kommandos"
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyE, KeyCategory:=wdKeyCategoryCommand, Command:="LoopEdit"
+    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyC, KeyCategory:=wdKeyCategoryCommand, Command:="CharCode"
     KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeySpacebar), KeyCategory:=wdKeyCategoryCommand, Command:="CheckWord"
 End Sub
 
@@ -234,3 +235,10 @@ Sub RegisterListtemplateRZ()
    End With
 End Sub
 
+Sub CharCode() ' Zeigt Code des Zeichens links vom Cursor
+   Dim c As String
+   Selection.MoveLeft Unit:=wdCharacter, Count:=1, Extend:=wdMove
+   c = Selection.Characters(1)
+   Selection.MoveRight Unit:=wdCharacter, Count:=1, Extend:=wdMove
+   StatusBar = """" + c + """ = " & AscW(c) & " = " & Hex(AscW(c)) & "h" & " = U+" & Right("0000" & CStr(Hex(AscW(c))), 4)
+End Sub
