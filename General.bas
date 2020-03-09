@@ -77,6 +77,36 @@ Public Function RxExecute(ByVal str, ByVal pat As String, Optional glob As Boole
    RxExecute = regex.Execute(str)
 End Function
 
+Function MakeString(str As String) As String ' Wandelt String mit #NUM in String mit ChrW(NUM) um
+   Dim res As String, num As String
+   Dim i As Integer, j As Integer
+   res = ""
+   i = 1
+   While i <= Len(str)
+      If Mid(str, i, 1) = "#" Then
+         If Mid(str, i + 1, 1) = "#" Then
+            res = res & "#"
+            i = i + 1
+         End If
+         If AscW(Mid(str, i + 1, 1)) > 47 And AscW(Mid(str, i + 1, 1)) < 58 Then
+            
+            num = ""
+            j = 1
+            While AscW(Mid(str, i + j, 1)) > 47 And AscW(Mid(str, i + j, 1)) < 58
+               num = num + CStr(AscW(Mid(str, i + j, 1)) - 48)
+               j = j + 1
+            Wend
+            res = res + ChrW(CInt(num))
+            i = i + j - 1
+         End If
+      Else
+         res = res + Mid(str, i, 1)
+      End If
+      i = i + 1
+   Wend
+   MakeString = res
+End Function
+
 '******************** Dialogs & Commands ********************
 Function Einlesen()                              'Liest Dialognamen ein
    Dim i As Integer
