@@ -134,12 +134,12 @@ Sub LoopPara()
          par.KeepWithNext = True
       End If
       
-'      Paragrafen-Überschriften (nur § ohne Text)
-'      pat = "^§ \d+" + Chr(160) + vbCr + "$"
-'      If RxTest(str, pat) Then
-'         par.Style = "G_ÜPara"
-'         par.KeepWithNext = True
-'      End If
+      '      Paragrafen-Überschriften (nur § ohne Text)
+      '      pat = "^§ \d+" + Chr(160) + vbCr + "$"
+      '      If RxTest(str, pat) Then
+      '         par.Style = "G_ÜPara"
+      '         par.KeepWithNext = True
+      '      End If
             
       'Artikel-Überschriften
       pat = "^Art\. .*$"

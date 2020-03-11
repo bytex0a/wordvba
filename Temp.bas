@@ -4,9 +4,9 @@ Option Explicit
 Private EncodeArr(64) As String * 1
 Private DecodeArr(255) As Byte
 Private Const EncChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" & _
-                         "abcdefghijklmnopqrstuvwxyz" & _
-                         "0123456789+/"
- 
+"abcdefghijklmnopqrstuvwxyz" & _
+"0123456789+/"
+
 Function Base64_Encode(strIn As String) As String
    Dim strOut As String
    Dim a(2)   As Byte
@@ -32,11 +32,11 @@ Function Base64_Encode(strIn As String) As String
       n2 = ((a(1) * 4) And &H3C) + ((a(2) \ 64) And &H3)
       N3 = a(2) And &H3F
       strOut = strOut & EncodeArr(n0) & EncodeArr(n1) & _
-               IIf(ausg > 1, EncodeArr(n2), "=") & IIf(ausg > 2, EncodeArr(N3), "=")
+                                                      IIf(ausg > 1, EncodeArr(n2), "=") & IIf(ausg > 2, EncodeArr(N3), "=")
    Loop
    Base64_Encode = strOut
 End Function
- 
+
 Function Base64_Decode(strIn As String) As String
    Dim strOut As String
    Dim a0     As Long
@@ -60,7 +60,7 @@ Function Base64_Decode(strIn As String) As String
    Next
    Base64_Decode = strOut
 End Function
- 
+
 Private Sub Base64_Initialize()
    Dim i  As Long
    Dim ch As String
@@ -72,6 +72,7 @@ Private Sub Base64_Initialize()
       DecodeArr(Asc(ch)) = i - 1
    Next
 End Sub
+
 Sub SucheinDatei()
    Const FILE_NAME = "z:\vbaProject.bin"
    Dim dat As Integer
@@ -79,19 +80,19 @@ Sub SucheinDatei()
    dat = FreeFile
    Open FILE_NAME For Binary Access Read As #dat
    ReDim bytes(LOF(dat))
-      Get #dat, , bytes()
+   Get #dat, , bytes()
    Close #dat
    For i = 0 To UBound(bytes) - 2
       If bytes(i) = Asc("D") And _
-         bytes(i + 1) = Asc("P") And _
-         bytes(i + 2) = Asc("x") Then
+                             bytes(i + 1) = Asc("P") And _
+                             bytes(i + 2) = Asc("x") Then
          Pr ("Signature found at: " & Hex(i))
          bytes(i + 2) = Asc("x")
          Pr (bytes(i) & bytes(i + 1))
       End If
    Next i
    Open FILE_NAME For Binary Access Write As #dat
-      Put #dat, , bytes()
+   Put #dat, , bytes()
    Close #dat
 End Sub
 
@@ -111,15 +112,16 @@ Sub TestBase64()
    Dim s1 As String, s2 As String
    
    Open IN_FILE For Binary Access Read As #1
-      s1 = Space(FileLen(IN_FILE))
-      Get 1, , s1
+   s1 = Space(FileLen(IN_FILE))
+   Get 1, , s1
    Close #1
    Base64_Initialize
-'   s2 = Caesar(Base64_Encode(s1), 2)
+   '   s2 = Caesar(Base64_Encode(s1), 2)
    s2 = Base64_Decode(Caesar(s1, -2))
    Open OUT_FILE For Binary Access Write As #1
-      Put 1, , s2
+   Put 1, , s2
    Close #1
    
 End Sub
+
 

@@ -40,7 +40,6 @@ Sub PrH(str As String)
    Debug.Print output
 End Sub
 
-
 Sub Inc(ByRef ival): ival = ival + 1: End Sub
 Sub Dec(ByRef ival): ival = ival - 1: End Sub
 
@@ -77,30 +76,39 @@ Public Function RxExecute(ByVal str, ByVal pat As String, Optional glob As Boole
    RxExecute = regex.Execute(str)
 End Function
 
-Function MakeString(str As String) As String ' Wandelt String mit #NUM in String mit ChrW(NUM) um
+Function AscPos(src As String, Pos As Long) As Long
+   AscPos = AscW(Mid(src, Pos, 1))
+End Function
+
+Function CPos(src As String, Pos As Long) As String
+   CPos = Mid(src, Pos, 1)
+End Function
+
+
+Function MakeString(str As String) As String     ' Wandelt String mit #NUM in String mit ChrW(NUM) um
    Dim res As String, num As String
-   Dim i As Integer, j As Integer
+   Dim i As Long, j As Long
    res = ""
    i = 1
    While i <= Len(str)
-      If Mid(str, i, 1) = "#" Then
-         If Mid(str, i + 1, 1) = "#" Then
+      If CPos(str, i) = "#" Then
+         If CPos(str, i + 1) = "#" Then
             res = res & "#"
             i = i + 1
          End If
-         If AscW(Mid(str, i + 1, 1)) > 47 And AscW(Mid(str, i + 1, 1)) < 58 Then
-            
+         If AscW(CPos(str, i + 1)) > 47 And AscW(CPos(str, i + 1)) < 58 Then
             num = ""
             j = 1
-            While AscW(Mid(str, i + j, 1)) > 47 And AscW(Mid(str, i + j, 1)) < 58
-               num = num + CStr(AscW(Mid(str, i + j, 1)) - 48)
+            Do While (i + j <= Len(str)) And AscW(CPos(str, i + j)) > 47 And AscW(CPos(str, i + j)) < 58
+               num = num + CStr(AscW(CPos(str, i + j)) - 48)
                j = j + 1
-            Wend
+               If i + j > Len(str) Then Exit Do
+            Loop
             res = res + ChrW(CInt(num))
             i = i + j - 1
          End If
       Else
-         res = res + Mid(str, i, 1)
+         res = res + CPos(str, i)
       End If
       i = i + 1
    Wend
@@ -122,7 +130,7 @@ Function Einlesen()                              'Liest Dialognamen ein
 End Function
 
 Sub BefehlslisteLaden()                          'Liest Befehlsliste ein
-   CommandForm.ListBox1.Clear
+   frmCommand.ListBox1.Clear
    Dim Count As Integer
    Dim entry As String
    Count = 1
@@ -130,7 +138,7 @@ Sub BefehlslisteLaden()                          'Liest Befehlsliste ein
    While EOF(1) = False
       Input #1, entry
       Befehle(Count) = entry
-      CommandForm.ListBox1.AddItem (entry)
+      frmCommand.ListBox1.AddItem (entry)
       Count = Count + 1
    Wend
    Close #1
@@ -138,7 +146,7 @@ Sub BefehlslisteLaden()                          'Liest Befehlsliste ein
    While EOF(1) = False
       Input #1, entry
       Befehle(Count) = entry
-      CommandForm.ListBox1.AddItem (entry)
+      frmCommand.ListBox1.AddItem (entry)
       Count = Count + 1
    Wend
    Close #1
@@ -193,15 +201,15 @@ Sub Kommandos()
    Dim com, s As String, sp As Integer, par As Paragraph, comarr() As String
    com = InputBox("Kommando eingeben", "Komanndo")
    If InStr(com, " ") = 0 Then
-   Select Case com
-   Case "hp":
-      s = "Horizontale Position : " & vbCr & Round(Application.Selection.Information(wdHorizontalPositionRelativeToTextBoundary) _
-                                                   / 72 * 2.54, 2) & "cm / " & Application.Selection.Information(wdHorizontalPositionRelativeToTextBoundary) & "pt. (relative to Text Boundary)" _
-                                    & vbCr & Round(Application.Selection.Information(wdHorizontalPositionRelativeToPage) _
-                                                   / 72 * 2.54, 2) & "cm / " & Application.Selection.Information(wdHorizontalPositionRelativeToPage) & "pt. (relative to Page)"
-      MsgBox s
-   Case "rds": Application.Run ("RedefineStyle")
-   End Select
+      Select Case com
+      Case "hp":
+         s = "Horizontale Position : " & vbCr & Round(Application.Selection.Information(wdHorizontalPositionRelativeToTextBoundary) _
+                                                      / 72 * 2.54, 2) & "cm / " & Application.Selection.Information(wdHorizontalPositionRelativeToTextBoundary) & "pt. (relative to Text Boundary)" _
+                                                    & vbCr & Round(Application.Selection.Information(wdHorizontalPositionRelativeToPage) _
+                                                                   / 72 * 2.54, 2) & "cm / " & Application.Selection.Information(wdHorizontalPositionRelativeToPage) & "pt. (relative to Page)"
+         MsgBox s
+      Case "rds": Application.Run ("RedefineStyle")
+      End Select
    Else
       comarr = Split(com)
       Select Case comarr(0)
@@ -215,45 +223,60 @@ Sub Kommandos()
    End If
 End Sub
 
-Sub BefehllisteAnzeigen()
-   CommandForm.Show
-   CommandForm.ListBox1.SetFocus
+Sub ViewSettings()
+   With ActiveWindow.View
+      .ShowAll = False
+      .ShowParagraphs = False
+      .ShowSpaces = False
+      .ShowTabs = False
+      .Show
+   End With
 End Sub
 
-Sub ShowKeyForm()
-   KeyForm.Show
+Sub BefehllisteAnzeigen()
+   frmCommand.Show
+   frmCommand.ListBox1.SetFocus
+End Sub
+
+Sub frmRegExp_Anzeigen()
+   frmRegExp.Show
+End Sub
+
+Sub ShowfrmKey()
+   frmKey.Show
 End Sub
 
 Sub RegisterHotkeys()
-    CustomizationContext = NormalTemplate
-    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, 192), KeyCategory:=wdKeyCategoryCommand, Command:="ShowKeyForm"
-    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyL, KeyCategory:=wdKeyCategoryCommand, Command:="BefehllisteAnzeigen"
-    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyD, KeyCategory:=wdKeyCategoryCommand, Command:="DlgAufrufen"
-    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyK, KeyCategory:=wdKeyCategoryCommand, Command:="Kommandos"
-    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyE, KeyCategory:=wdKeyCategoryCommand, Command:="LoopEdit"
-    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyC, KeyCategory:=wdKeyCategoryCommand, Command:="CharCode"
-    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeySpacebar), KeyCategory:=wdKeyCategoryCommand, Command:="CheckWord"
+   CustomizationContext = NormalTemplate
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, 192), KeyCategory:=wdKeyCategoryCommand, Command:="ShowfrmKey"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyL, KeyCategory:=wdKeyCategoryCommand, Command:="BefehllisteAnzeigen"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyR, KeyCategory:=wdKeyCategoryCommand, Command:="frmRegExp_Anzeigen"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyD, KeyCategory:=wdKeyCategoryCommand, Command:="DlgAufrufen"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyK, KeyCategory:=wdKeyCategoryCommand, Command:="Kommandos"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyV, KeyCategory:=wdKeyCategoryCommand, Command:="ViewSettings"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyC, KeyCategory:=wdKeyCategoryCommand, Command:="CharCode"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeySpacebar), KeyCategory:=wdKeyCategoryCommand, Command:="CheckWord"
 End Sub
 
 '******************** ListTemplate Functions ********************
 
 Public Function ListTemplateIndex(ListTemplateName As String, _
-  Source As Word.Document) As ListTemplate
-  Dim lt As ListTemplate
+                                  Source As Word.Document) As ListTemplate
+   Dim lt As ListTemplate
   
-  For Each lt In Source.ListTemplates
-    If lt.Name = ListTemplateName Then
-      Set ListTemplateIndex = lt
-      Exit For
-    End If
-  Next
+   For Each lt In Source.ListTemplates
+      If lt.Name = ListTemplateName Then
+         Set ListTemplateIndex = lt
+         Exit For
+      End If
+   Next
  
-  If ListTemplateIndex Is Nothing Then
-    '"True" bedeutet, ListTemplate hat neun Ebenen
-    Set ListTemplateIndex = Source.ListTemplates.Add(True)
-    ListTemplateIndex.Name = ListTemplateName
-  End If
-  Set lt = Nothing
+   If ListTemplateIndex Is Nothing Then
+      '"True" bedeutet, ListTemplate hat neun Ebenen
+      Set ListTemplateIndex = Source.ListTemplates.Add(True)
+      ListTemplateIndex.Name = ListTemplateName
+   End If
+   Set lt = Nothing
 End Function
 
 Sub RegisterListtemplateRZ()
@@ -265,10 +288,12 @@ Sub RegisterListtemplateRZ()
    End With
 End Sub
 
-Sub CharCode() ' Zeigt Code des Zeichens links vom Cursor
+Sub CharCode()                                   ' Zeigt Code des Zeichens links vom Cursor
    Dim c As String
    Selection.MoveLeft Unit:=wdCharacter, Count:=1, Extend:=wdMove
    c = Selection.Characters(1)
    Selection.MoveRight Unit:=wdCharacter, Count:=1, Extend:=wdMove
    StatusBar = """" + c + """ = " & AscW(c) & " = " & Hex(AscW(c)) & "h" & " = U+" & Right("0000" & CStr(Hex(AscW(c))), 4)
 End Sub
+
+

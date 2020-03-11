@@ -7,17 +7,17 @@ Sub ExportModules()
    Dim s, szFileName As String
    For Each vbc In VBE.VBProjects("Normal").VBComponents
       If vbc.Name <> "ThisDocument" Then
-      szFileName = vbc.Name
-      Select Case vbc.Type
-            Case vbext_ct_ClassModule
-                szFileName = szFileName & ".cls"
-            Case vbext_ct_MSForm
-                szFileName = szFileName & ".frm"
-            Case vbext_ct_StdModule
-                szFileName = szFileName & ".bas"
-            Case vbext_ct_Document
-      End Select
-      vbc.Export MODULE_PATH + szFileName
+         szFileName = vbc.Name
+         Select Case vbc.Type
+         Case vbext_ct_ClassModule
+            szFileName = szFileName & ".cls"
+         Case vbext_ct_MSForm
+            szFileName = szFileName & ".frm"
+         Case vbext_ct_StdModule
+            szFileName = szFileName & ".bas"
+         Case vbext_ct_Document
+         End Select
+         vbc.Export MODULE_PATH + szFileName
       End If
    Next vbc
 End Sub
@@ -29,9 +29,9 @@ Sub ImportModules()
    On Error Resume Next
    StrFile = Dir(MODULE_PATH & "*.*")
    Do While Len(StrFile) > 0
-       If Right(StrFile, 3) <> "frx" Then VBE.VBProjects(PROJECT_NAME).VBComponents.Import MODULE_PATH & StrFile
-       Debug.Print StrFile
-       StrFile = Dir
+      If Right(StrFile, 3) <> "" Then VBE.VBProjects(PROJECT_NAME).VBComponents.Import MODULE_PATH & StrFile
+      Debug.Print StrFile
+      StrFile = Dir
    Loop
 End Sub
 
@@ -40,13 +40,13 @@ Sub DeleteModules()
    Dim i As Integer
    Dim sName As String
    For i = 1 To VBE.VBProjects(PROJECT_NAME).VBComponents.Count
-   sName = VBE.VBProjects(PROJECT_NAME).VBComponents.Item(i).Name
-   If sName <> "ThisDocument" Then
-     With VBE.VBProjects(PROJECT_NAME).VBComponents
-         .Remove .Item(sName)
-     End With
-    Exit For
-   End If
+      sName = VBE.VBProjects(PROJECT_NAME).VBComponents.Item(i).Name
+      If sName <> "ThisDocument" Then
+         With VBE.VBProjects(PROJECT_NAME).VBComponents
+            .Remove .Item(sName)
+         End With
+         Exit For
+      End If
    Next i
 End Sub
 
