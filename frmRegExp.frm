@@ -13,7 +13,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 '***************** RegExp Suchen - Ersetzen *****************
 
 Private Sub CheckBox1_Change()
@@ -23,6 +22,41 @@ Private Sub CheckBox1_Change()
    Else
       ComboBox3.Enabled = True
       ComboBox4.Enabled = True
+   End If
+End Sub
+
+Private Sub CheckBox2_Change()
+  Dim srng As Range
+   Dim pat As String, rpl As String, rpl2 As String, style As String, suchstyle As String
+   Dim rng As Range
+   Dim par As Paragraph
+   Dim cnt As Long
+   If CheckBox2.Value = True Then
+      If OptionButton1.Value = True Then Set rng = ActiveDocument.Range Else Set rng = Selection.Range
+      pat = MakeString(ComboBox1.Text)
+      pat = Replace(pat, "\w", "[A-Za-zäöüÄÖÜß-]")
+      suchstyle = ComboBox4.Text
+      Set objUndo = Application.UndoRecord
+      objUndo.StartCustomRecord ("RegExp Vorschau")
+      If pat = "" Then MsgBox ("Kein Suchausdruck"): Exit Sub
+         
+      If CheckBox1.Value = True Then ' Ersetzung paragrafenweise
+         For cnt = rng.Paragraphs.Count To 1 Step -1
+            Set par = rng.Paragraphs(cnt)
+            If ComboBox4.Value = "" Then ' keine SuchFV
+               If RxTest(par.Range.Text, pat) Then
+                  par.Range.HighlightColorIndex = wdBrightGreen
+               End If
+            Else ' SuchFV
+               If RxTest(par.Range.Text, pat) And (par.style = suchstyle) And (suchstyle <> "") Then
+                  par.Range.HighlightColorIndex = wdBrightGreen
+               End If
+            End If ' SuchFV
+         Next cnt
+      End If
+      objUndo.EndCustomRecord
+      Else
+         ActiveDocument.Undo
    End If
 End Sub
 
@@ -39,6 +73,21 @@ End Sub
 Private Sub CommandButton4_Click()
    FillFVCombo
 End Sub
+
+Sub RemoveNamedHighlight()
+' this just removes bright green highlights
+Selection.HomeKey unit:=wdDocument
+With Selection.Find
+  .Highlight = True
+  Do While (.Execute(Forward:=True) = True) = True
+    If Selection.Range.HighlightColorIndex = wdBrightGreen Then
+       Selection.Range.HighlightColorIndex = wdAuto
+       Selection.Collapse direction:=wdCollapseEnd
+    End If
+  Loop
+End With
+End Sub
+
 
 Private Sub UserForm_Initialize()
    FillFVCombo
@@ -63,12 +112,13 @@ End Sub
 
 Private Sub CommandButton1_Click()               ' Ausführen
    Dim srng As Range
-   Dim pat As String, rpl As String, rpl2 As String, style As String, suchstyle As String
+   Dim pat As String, rpl As String, rpl2 As String, style As String, suchstyle As String, newtext As String
    Dim rng As Range
    Dim par As Paragraph
-   Dim cnt As Long
+   Dim cnt As Long, maxcnt As Long, t1 As Long, t2 As Long
    If OptionButton1.Value = True Then Set rng = ActiveDocument.Range Else Set rng = Selection.Range
    pat = MakeString(ComboBox1.Text)
+   pat = Replace(pat, "\w", "[A-Za-zäöüÄÖÜß-]")
    rpl = MakeString(ComboBox2.Text)
    rpl2 = Replace(rpl, "\", "$")
    rpl = Replace(rpl2, "$$", "\")
@@ -78,36 +128,40 @@ Private Sub CommandButton1_Click()               ' Ausführen
    objUndo.StartCustomRecord ("RegExp Suchen Ersetzen")
    
    If pat = "" Then MsgBox ("Kein Suchausdruck"): Exit Sub
-      
-   If CheckBox1.Value = True Then ' Ersetzung paragrafenweise
-      For cnt = rng.Paragraphs.Count To 1 Step -1
-         Set par = rng.Paragraphs(cnt)
-         If ComboBox4.Value = "" Then ' keine SuchFV
+   maxcnt = rng.Paragraphs.Count
+   cnt = 0
+   If CheckBox1.Value = True Then                ' Ersetzung paragrafenweise
+      t1 = GetTickCount
+      For Each par In rng.Paragraphs             ' Schleife durch Paragraphs
+         cnt = cnt + 1
+         If cnt > maxcnt + 10 Then Exit For      ' Vorbeugung gegen infinite loop
+         If ComboBox4.Value = "" Then            ' ohne SuchFV
             If RxTest(par.Range.Text, pat) Then
                If rpl = ":del" Then
                   par.Range.Delete
                Else
                   If rpl <> "" Then
-                     If rpl = ":e" Then par.Range.Text = RxReplace(par.Range.Text, pat, "") Else
-                     par.Range.Text = RxReplace(par.Range.Text, pat, rpl)
-                     Set par = rng.Paragraphs(cnt)
+                     If rpl = ":e" Then newtext = RxReplace(par.Range.Text, pat, "") Else newtext = RxReplace(par.Range.Text, pat, rpl)
+                     SetParText par, newtext
                   End If
                End If
-            If style <> "" Then par.style = style
+               If style <> "" Then par.style = style
             End If
-         Else ' SuchFV
+         Else                                    ' mit SuchFV
             If RxTest(par.Range.Text, pat) And (par.style = suchstyle) And (suchstyle <> "") Then
-               If rpl = "#del" Then
+               If rpl = "#del" Then ' Absatz löschen
                   par.Range.Delete
                Else
-               par.Range.Text = RxReplace(par.Range.Text, pat, rpl)
-               Set par = rng.Paragraphs(cnt)
+                  newtext = RxReplace(par.Range.Text, pat, rpl)
+                  SetParText par, newtext
+               End If
+               If style <> "" Then par.style = style ' Falls FV zugewiesen werden soll
             End If
-            If style <> "" Then par.style = style
-            End If
-         End If ' SuchFV
-      Next cnt
-   Else ' Ersetzung bezogen auf das gesamte Dokument
+         End If                                  ' Ende mit/ohne SuchFV
+      Next
+      t2 = GetTickCount
+      Debug.Print (t2 - t1)
+   Else                                          ' Ersetzung bezogen auf das gesamte Dokument
       If OptionButton1.Value = True Then
          Set rng = ActiveDocument.Range
       Else: Set rng = Selection.Range
@@ -119,9 +173,5 @@ Private Sub CommandButton1_Click()               ' Ausführen
    objUndo.EndCustomRecord
    ComboBox1.SetFocus
 End Sub
-
-
-
-
 
 

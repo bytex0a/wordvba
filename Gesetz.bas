@@ -21,7 +21,7 @@ Sub ErstelleStyles()
    st = ActiveDocument.Styles.Add("G_Absatz", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_Num1", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_Num2", wdStyleTypeParagraph)
-   st = ActiveDocument.Styles.Add("G_Num3", wdStyleTypeParagraph)
+   st = ActiveDocument.Styles.Add("G_Num3", wdStyleTypeParagraph): st.BaseStyle = ""
    st = ActiveDocument.Styles.Add("G_Para", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_FolgeText", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_ÜPara", wdStyleTypeParagraph)

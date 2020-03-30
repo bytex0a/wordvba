@@ -125,3 +125,34 @@ Sub TestBase64()
 End Sub
 
 
+'Sub SetParText(ByRef p As Paragraph, txt As String)
+'   Dim rng As Range
+'   Set rng = p.Range
+'   rng.Select
+'   Selection.MoveLeft wdCharacter, 1, wdExtend
+'   Selection.Delete
+'   Selection.InsertBefore (txt)
+'   Selection.Collapse wdCollapseEnd
+'   Selection.MoveRight wdCharacter, 1, wdExtend
+'   Selection.Delete
+'End Sub
+
+
+
+Sub ptest()
+   Dim p As Paragraph
+   Dim i, j, a, b, c, s As String, rng As Range
+   Dim ud As UndoRecord
+      i = 1
+      For Each p In ActiveDocument.Paragraphs
+        i = i + 1
+        s = RxReplace(p.Range.Text, "g", "G")
+         SetParText p, s
+        If i = 10 Then Exit For
+      Next p
+   Set ud = Application.UndoRecord
+   ud.StartCustomRecord ("t")
+   ud.EndCustomRecord
+End Sub
+
+

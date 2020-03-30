@@ -34,7 +34,7 @@ Sub Randnummern_Erstellen()
       p.Range.Select
       Selection.Collapse wdCollapseStart
       Selection.Range.InsertBefore ("rz ")
-      Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdExtend
+      Selection.MoveRight unit:=wdWord, Count:=1, Extend:=wdExtend
       Selection.Range.InsertAutoText
    Next p
    Application.ScreenUpdating = True
@@ -101,3 +101,10 @@ Sub LoopEdit()
 End Sub
 
 
+Sub RemoveHyperLinks()
+   Dim link As Hyperlink, c As Integer
+   For c = ActiveDocument.Hyperlinks.Count To 1 Step -1
+      Set link = ActiveDocument.Hyperlinks(c)
+      link.Range.Paragraphs(1).Range.Delete
+    Next c
+End Sub

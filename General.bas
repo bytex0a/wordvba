@@ -290,10 +290,15 @@ End Sub
 
 Sub CharCode()                                   ' Zeigt Code des Zeichens links vom Cursor
    Dim c As String
-   Selection.MoveLeft Unit:=wdCharacter, Count:=1, Extend:=wdMove
+   Selection.MoveLeft unit:=wdCharacter, Count:=1, Extend:=wdMove
    c = Selection.Characters(1)
-   Selection.MoveRight Unit:=wdCharacter, Count:=1, Extend:=wdMove
+   Selection.MoveRight unit:=wdCharacter, Count:=1, Extend:=wdMove
    StatusBar = """" + c + """ = " & AscW(c) & " = " & Hex(AscW(c)) & "h" & " = U+" & Right("0000" & CStr(Hex(AscW(c))), 4)
 End Sub
 
-
+Sub SetParText(ByRef p As Paragraph, txt As String)
+   Dim rng As Range
+   Set rng = p.Range
+   rng.MoveEnd wdCharacter, 0
+   rng.Text = txt
+End Sub
