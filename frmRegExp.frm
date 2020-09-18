@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmRegExp 
    Caption         =   "RegExp Suchen - Ersetzen"
-   ClientHeight    =   3465
+   ClientHeight    =   3471
    ClientLeft      =   105
    ClientTop       =   435
    ClientWidth     =   5265
@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 '***************** RegExp Suchen - Ersetzen *****************
 
 Private Sub CheckBox1_Change()
@@ -76,7 +77,7 @@ End Sub
 
 Sub RemoveNamedHighlight()
 ' this just removes bright green highlights
-Selection.HomeKey unit:=wdDocument
+Selection.HomeKey Unit:=wdDocument
 With Selection.Find
   .Highlight = True
   Do While (.Execute(Forward:=True) = True) = True
@@ -149,7 +150,7 @@ Private Sub CommandButton1_Click()               ' Ausführen
             End If
          Else                                    ' mit SuchFV
             If RxTest(par.Range.Text, pat) And (par.style = suchstyle) And (suchstyle <> "") Then
-               If rpl = "#del" Then ' Absatz löschen
+               If rpl = ":del" Then ' Absatz löschen
                   par.Range.Delete
                Else
                   newtext = RxReplace(par.Range.Text, pat, rpl)
@@ -173,5 +174,3 @@ Private Sub CommandButton1_Click()               ' Ausführen
    objUndo.EndCustomRecord
    ComboBox1.SetFocus
 End Sub
-
-

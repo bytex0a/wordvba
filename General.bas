@@ -2,8 +2,7 @@ Attribute VB_Name = "General"
 '******************** General Variables and Routines ********************
 Option Explicit
 Public arr() As Variant
-Public Befehle(3290) As String
-Public regex As New regexp
+Public regex As New RegExp
 
 Sub AutoExec()                                   'Run automatically
    Einlesen
@@ -18,26 +17,26 @@ Sub PrAst(str As String)
 End Sub
 
 Sub PrBy(str As String)
-   Dim bytes() As Byte
+   Dim bytes() As Byte, soutput As String, i As Long
    bytes = StrConv(str, vbFromUnicode)
-   output = ""
+   soutput = ""
    For i = 0 To UBound(bytes)
-      output = output & " " & CStr(bytes(i))
+      soutput = soutput & " " & CStr(bytes(i))
    Next i
-   Debug.Print output
+   Debug.Print soutput
 End Sub
 
 Sub PrH(str As String)
    Dim bytes() As Byte
    bytes = StrConv(str, vbFromUnicode)
-   output = ""
+   Output = ""
    For i = 0 To UBound(bytes)
       If Len(CStr(Hex(bytes(i)))) = 1 Then
-         output = output & " 0" & CStr(Hex(bytes(i)))
-      Else: output = output & " " & CStr(Hex(bytes(i)))
+         Output = Output & " 0" & CStr(Hex(bytes(i)))
+      Else: Output = Output & " " & CStr(Hex(bytes(i)))
       End If
    Next i
-   Debug.Print output
+   Debug.Print Output
 End Sub
 
 Sub Inc(ByRef ival): ival = ival + 1: End Sub
@@ -116,50 +115,35 @@ Function MakeString(str As String) As String     ' Wandelt String mit #NUM in St
 End Function
 
 '******************** Dialogs & Commands ********************
-Function Einlesen()                              'Liest Dialognamen ein
+Sub Einlesen()                              'Liest Dialognamen ein
    Dim i As Integer
    i = 0
    ReDim arr(1)
-   Open NormalTemplate.Path + "\dlglist.txt" For Input As #1 ' Open file for input.
+   Open NormalTemplate.PATH + "\dlglist.txt" For Input As #1 ' Open file for input.
    Do While Not EOF(1)                           ' Loop until end of file.
       Line Input #1, arr(i)                      ' read next line from file and add text to the array
       i = i + 1
       ReDim Preserve arr(i)                      ' Redim the array for the new element
    Loop
    Close #1                                      ' Close file.
-End Function
+End Sub
 
 Sub BefehlslisteLaden()                          'Liest Befehlsliste ein
-   frmCommand.ListBox1.Clear
-   Dim Count As Integer
-   Dim entry As String
-   Count = 1
-   Open NormalTemplate.Path + "\Befehlsliste.txt" For Input As #1
-   While EOF(1) = False
-      Input #1, entry
-      Befehle(Count) = entry
-      frmCommand.ListBox1.AddItem (entry)
-      Count = Count + 1
-   Wend
-   Close #1
-   Open NormalTemplate.Path + "\CommandList.txt" For Input As #1
-   While EOF(1) = False
-      Input #1, entry
-      Befehle(Count) = entry
-      frmCommand.ListBox1.AddItem (entry)
-      Count = Count + 1
-   Wend
-   Close #1
+   Dim cItem As Variant
+   If colCmd.Count = 0 Then FillcolCmd
+   With frmCommand.ListBox1
+      .Clear
+      For Each cItem In colCmd
+         .AddItem cItem
+      Next cItem
+   End With
 End Sub
 
 Sub DlgAufrufen()
    Dim inp, liste As String, i, cnt As Integer
    On Error Resume Next
-   i = UBound(arr)
-   If Err.Number = 9 Then
-      Call Einlesen
-      StatusBar = "Lese Dialoge ein..."
-   End If
+   i = colDlg.Count
+   If colDlg.Count = 0 Then FillcolDlg
    inp = InputBox("Dialog-Nr.:", "Dialoge aufrufen")
    If inp = "" Then Exit Sub
    If IsNumeric(inp) Then
@@ -167,9 +151,9 @@ Sub DlgAufrufen()
    Else
       liste = ""
       cnt = 0
-      For i = 0 To UBound(arr)
-         If InStr(LCase(arr(i)), LCase(inp)) Then
-            liste = liste & arr(i) & vbCr
+      For i = 1 To colDlg.Count
+         If InStr(LCase(colDlg(i)), LCase(inp)) Then
+            liste = liste & colDlg(i) & vbCr
             cnt = cnt + 1
          End If
       Next i
@@ -223,16 +207,6 @@ Sub Kommandos()
    End If
 End Sub
 
-Sub ViewSettings()
-   With ActiveWindow.View
-      .ShowAll = False
-      .ShowParagraphs = False
-      .ShowSpaces = False
-      .ShowTabs = False
-      .Show
-   End With
-End Sub
-
 Sub BefehllisteAnzeigen()
    frmCommand.Show
    frmCommand.ListBox1.SetFocus
@@ -246,6 +220,19 @@ Sub ShowfrmKey()
    frmKey.Show
 End Sub
 
+Sub ToggleStyleInspector()
+   If Application.TaskPanes(wdTaskPaneStyleInspector).Visible = True Then _
+      Application.TaskPanes(wdTaskPaneStyleInspector).Visible = False Else _
+      Application.TaskPanes(wdTaskPaneStyleInspector).Visible = True
+End Sub
+
+Sub H2D()
+   Dim nr As Integer
+   nr = CInt("&h" + InputBox("Hex"))
+   StatusBar = nr
+End Sub
+
+
 Sub RegisterHotkeys()
    CustomizationContext = NormalTemplate
    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, 192), KeyCategory:=wdKeyCategoryCommand, Command:="ShowfrmKey"
@@ -256,6 +243,7 @@ Sub RegisterHotkeys()
    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyV, KeyCategory:=wdKeyCategoryCommand, Command:="ViewSettings"
    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyC, KeyCategory:=wdKeyCategoryCommand, Command:="CharCode"
    KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeySpacebar), KeyCategory:=wdKeyCategoryCommand, Command:="CheckWord"
+   KeyBindings.Add KeyCode:=BuildKeyCode(wdKeyControl, wdKeyComma), KeyCode2:=wdKeyI, KeyCategory:=wdKeyCategoryCommand, Command:="ToggleStyleInspector"
 End Sub
 
 '******************** ListTemplate Functions ********************
@@ -290,10 +278,10 @@ End Sub
 
 Sub CharCode()                                   ' Zeigt Code des Zeichens links vom Cursor
    Dim c As String
-   Selection.MoveLeft unit:=wdCharacter, Count:=1, Extend:=wdMove
+   Selection.MoveLeft Unit:=wdCharacter, Count:=1, Extend:=wdMove
    c = Selection.Characters(1)
-   Selection.MoveRight unit:=wdCharacter, Count:=1, Extend:=wdMove
-   StatusBar = """" + c + """ = " & AscW(c) & " = " & Hex(AscW(c)) & "h" & " = U+" & Right("0000" & CStr(Hex(AscW(c))), 4)
+   Selection.MoveRight Unit:=wdCharacter, Count:=1, Extend:=wdMove
+   StatusBar = """" + c + """ = " & AscW(c) & " = " & Hex(AscW(c)) & "h" & " = U+" & right("0000" & CStr(Hex(AscW(c))), 4)
 End Sub
 
 Sub SetParText(ByRef p As Paragraph, txt As String)
@@ -302,3 +290,4 @@ Sub SetParText(ByRef p As Paragraph, txt As String)
    rng.MoveEnd wdCharacter, 0
    rng.Text = txt
 End Sub
+

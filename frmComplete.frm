@@ -13,11 +13,12 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Private Sub ListBox1_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
    Set WshShell = CreateObject("WScript.Shell")
    If KeyCode = vbKeyEscape Then Me.Hide
    If (KeyCode = vbKeyReturn) Or (KeyCode = vbKeySpace) Then
-      Selection.MoveLeft unit:=wdCharacter, Count:=1
+      Selection.MoveLeft Unit:=wdCharacter, Count:=1
       Selection.Words(1).Select
       Selection.Range.Text = ListBox1.List(ListBox1.ListIndex) + ADD_SPACE
       Me.Hide
@@ -30,4 +31,7 @@ End Sub
 Private Sub UserForm_Activate()
    ListBox1.ListIndex = 0
 End Sub
+
+
+
 

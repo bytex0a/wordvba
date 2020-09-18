@@ -5,7 +5,7 @@ Public Sub CleanUp()
       .ClearFormatting
       .Replacement.ClearFormatting
       .MatchWildcards = False
-      .Text = "^p^p"
+      .Text = "^p"
       .Replacement.Text = "^p"
       .Execute Replace:=wdReplaceAll, Forward:=True, Wrap:=wdFindContinue
    End With
@@ -21,7 +21,7 @@ Sub ErstelleStyles()
    st = ActiveDocument.Styles.Add("G_Absatz", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_Num1", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_Num2", wdStyleTypeParagraph)
-   st = ActiveDocument.Styles.Add("G_Num3", wdStyleTypeParagraph): st.BaseStyle = ""
+   st = ActiveDocument.Styles.Add("G_Num3", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_Para", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_FolgeText", wdStyleTypeParagraph)
    st = ActiveDocument.Styles.Add("G_ÜPara", wdStyleTypeParagraph)
@@ -83,7 +83,7 @@ End Sub
 
 Sub LoopPara()
    Dim par, ppar, npar As Paragraph
-   Dim regex      As New regexp
+   Dim regex      As New RegExp
    Dim str, pat, repls As String
    Dim objUndo As UndoRecord
    

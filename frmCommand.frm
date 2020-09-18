@@ -31,33 +31,34 @@ End Sub
 Private Sub TextBox1_Change()
    Dim part() As String
    Dim Count As Integer, anz As Byte
+   Dim cItem As Variant
    ListBox1.Clear
-   For Count = 1 To 3290
+   For Each cItem In colCmd
       st = TextBox1.Text
-      If Left(st, 1) = " " Then bflag = True: st = Mid(st, 2) Else bflag = False
+      If left(st, 1) = " " Then bflag = True: st = Mid(st, 2) Else bflag = False
       part = Split(st, " ")
-      bfc = UCase(Befehle(Count))
+      bfc = UCase(cItem)
       Select Case UBound(part)
       Case 0
          If bflag = True Then
-            If InStr(bfc, UCase(part(0))) = 1 Then ListBox1.AddItem (Befehle(Count))
+            If InStr(bfc, UCase(part(0))) = 1 Then ListBox1.AddItem cItem
          Else
-            If InStr(bfc, UCase(part(0))) > 0 Then ListBox1.AddItem (Befehle(Count))
+            If InStr(bfc, UCase(part(0))) > 0 Then ListBox1.AddItem cItem
          End If
       Case 1
          If InStr(bfc, UCase(part(0))) > 0 And _
-                                       InStr(bfc, UCase(part(1))) > 0 Then ListBox1.AddItem (Befehle(Count))
+                                       InStr(bfc, UCase(part(1))) > 0 Then ListBox1.AddItem cItem
       Case 2
          If InStr(bfc, UCase(part(0))) > 0 And _
                                        InStr(bfc, UCase(part(1))) > 0 And _
-                                       InStr(bfc, UCase(part(2))) > 0 Then ListBox1.AddItem (Befehle(Count))
+                                       InStr(bfc, UCase(part(2))) > 0 Then ListBox1.AddItem cItem
       Case 3
          If InStr(bfc, UCase(part(0))) > 0 And _
                                        InStr(bfc, UCase(part(1))) > 0 And _
                                        InStr(bfc, UCase(part(2))) > 0 And _
-                                       InStr(bfc, UCase(part(3))) > 0 Then ListBox1.AddItem (Befehle(Count))
+                                       InStr(bfc, UCase(part(3))) > 0 Then ListBox1.AddItem cItem
       End Select
-   Next Count
+   Next cItem
 End Sub
 
 Private Sub TextBox1_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
@@ -65,15 +66,26 @@ Private Sub TextBox1_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
    If KeyCode = vbKeyDown Then ListBox1.Selected(0) = True: ListBox1.SetFocus
    If KeyCode = vbKeyReturn Then
       On Error Resume Next
+      If (ListBox1.ListIndex) = -1 Then
+         If ListBox1.ListCount > 0 Then ListBox1.ListIndex = 0
+         Else: Exit Sub
+      End If
       Application.Run (ListBox1.List(ListBox1.ListIndex))
       frmCommand.Hide
    End If
 End Sub
 
-Private Sub UserForm_Initialize()
+Private Sub UserForm_Activate()
+   TextBox1.SetFocus
    TextBox1.Text = ""
    BefehlslisteLaden
-   TextBox1.SetFocus
 End Sub
+
+Private Sub UserForm_Initialize()
+End Sub
+
+
+
+
 
 

@@ -1,8 +1,13 @@
 Attribute VB_Name = "ModulOp"
-Global Const MODULE_PATH = "D:\dok\word\makros\"
-'Global Const MODULE_PATH = "U:\Dokumente\Sonstiges\Word"
+Global MODULE_PATH As String
+'Global Const MODULE_PATH = "D:\dok\word\makros\"
+'Global Const MODULE_PATH = "U:\Dokumente\Sonstiges\Word\"
 
 Sub ExportModules()
+   If InputBox("(1) D:\Dok\Word\Makros" & vbCr & "(2) U:\Dokumente\Sonstiges\Word", "Bitte wählen", "1") = "1" Then
+      MODULE_PATH = "D:\dok\word\makros\"
+      Else: MODULE_PATH = "U:\Dokumente\Sonstiges\Word\"
+   End If
    Dim proj As VBProject, vbc As VBComponent
    Dim s, szFileName As String
    For Each vbc In VBE.VBProjects("Normal").VBComponents
@@ -23,20 +28,20 @@ Sub ExportModules()
 End Sub
 
 Sub ImportModules()
-   Const PROJECT_NAME = "Project"
+   Const PROJECT_NAME = 2 '"Normal"
    Dim StrFile As String
    Dim proj As VBProject, vbc As VBComponent
    On Error Resume Next
    StrFile = Dir(MODULE_PATH & "*.*")
    Do While Len(StrFile) > 0
-      If Right(StrFile, 3) <> "" Then VBE.VBProjects(PROJECT_NAME).VBComponents.Import MODULE_PATH & StrFile
+      VBE.VBProjects(PROJECT_NAME).VBComponents.Import MODULE_PATH & StrFile
       Debug.Print StrFile
       StrFile = Dir
    Loop
 End Sub
 
 Sub DeleteModules()
-   Const PROJECT_NAME = "Project"
+   Const PROJECT_NAME = "Normal"
    Dim i As Integer
    Dim sName As String
    For i = 1 To VBE.VBProjects(PROJECT_NAME).VBComponents.Count
@@ -49,4 +54,3 @@ Sub DeleteModules()
       End If
    Next i
 End Sub
-

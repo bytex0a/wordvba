@@ -11,8 +11,11 @@ Sub BuildDatabase()
    t1 = GetTickCount
    i = 1
    StatusBar = "Rebuild Database..."
-   Set dict = CreateObject("Scripting.Dictionary")
+   If dict Is Nothing Then Set dict = CreateObject("Scripting.Dictionary")
+   dict.RemoveAll
+   On Error Resume Next
    dict.Add "ADNAME", ActiveDocument.Name
+   dict("ADNAME") = ActiveDocument.Name
    Set resultdict = CreateObject("Scripting.Dictionary")
    For Each wrng In ActiveDocument.Words
       wort = wrng.Text
@@ -35,14 +38,14 @@ Sub CheckWord()
    ElseIf (ActiveDocument.Words.Count < 5000) Or (dict("ADNAME") <> ActiveDocument.Name) Then BuildDatabase
    End If
    resultdict.RemoveAll
-   Selection.MoveLeft unit:=wdCharacter, Count:=1
+   Selection.MoveLeft Unit:=wdCharacter, Count:=1
    wort = Selection.Words(1)
    If wort = "" Then Exit Sub
-   Selection.MoveRight unit:=wdCharacter, Count:=1
+   Selection.MoveRight Unit:=wdCharacter, Count:=1
     
    i = 1
    For Each Item In dict.keys
-      If (LCase(Left(Item, Len(wort))) = LCase(wort)) And (LCase(wort) <> LCase(Item)) Then
+      If (LCase(left(Item, Len(Trim(wort)))) = LCase(Trim(wort))) And (LCase(Trim(wort)) <> LCase(Item)) Then
          resultdict.Add Item, i
          i = i + 1
       End If
@@ -52,7 +55,7 @@ Sub CheckWord()
       frmComplete.Show
    End If
    If resultdict.Count = 1 Then
-      Selection.MoveLeft unit:=wdCharacter, Count:=1
+      Selection.MoveLeft Unit:=wdCharacter, Count:=1
       Selection.Words(1).Select
       a = resultdict.keys
       Selection.Range.Text = a(0) + ADD_SPACE

@@ -34,7 +34,7 @@ Sub Randnummern_Erstellen()
       p.Range.Select
       Selection.Collapse wdCollapseStart
       Selection.Range.InsertBefore ("rz ")
-      Selection.MoveRight unit:=wdWord, Count:=1, Extend:=wdExtend
+      Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdExtend
       Selection.Range.InsertAutoText
    Next p
    Application.ScreenUpdating = True
@@ -59,6 +59,23 @@ Sub Randnummern_Loeschen()
    
    objUndo.EndCustomRecord
 End Sub
+
+Sub Randnummern_Ausrichten()
+   For i = 1 To ActiveDocument.Frames.Count
+      ActiveDocument.Frames(i).Select
+      Selection.MoveRight wdCharacter
+      ActiveDocument.Frames(i).Select
+      Selection.MoveRight wdCharacter
+      b = Selection.Information(wdVerticalPositionRelativeToPage)
+      Selection.MoveEnd wdParagraph
+      Selection.Collapse wdCollapseEnd
+      Selection.MoveLeft wdCharacter
+      ed = Selection.Information(wdVerticalPositionRelativeToPage)
+      Debug.Print PointsToCentimeters(ed - b)
+      ActiveDocument.Frames(i).VerticalPosition = (ed - b + 1)
+   Next
+End Sub
+
 
 Sub DeleteUnusedStyles()
    Dim oStyle As style
@@ -100,11 +117,66 @@ Sub LoopEdit()
    objUndo.EndCustomRecord
 End Sub
 
+Sub RemoveHyperlinks()
+ Dim l As Hyperlink, i As Integer
+ For i = ActiveDocument.Hyperlinks.Count To 1 Step -1
+    ActiveDocument.Hyperlinks(i).Range.Select
+    Selection.Paragraphs(1).Range.Delete
+ Next i
+End Sub
 
-Sub RemoveHyperLinks()
-   Dim link As Hyperlink, c As Integer
-   For c = ActiveDocument.Hyperlinks.Count To 1 Step -1
-      Set link = ActiveDocument.Hyperlinks(c)
-      link.Range.Paragraphs(1).Range.Delete
-    Next c
+
+Sub Satznummern_Erstellen()
+   Dim rng As Range
+   Dim txt As String, txt2 As String
+   Dim fld As Field
+   Dim sty As style
+   Dim objUndo As UndoRecord, par As Paragraph
+   Set objUndo = Application.UndoRecord
+   objUndo.StartCustomRecord ("Edit Loop")
+   On Error Resume Next
+   Set sty = ActiveDocument.Styles("SatzNr")
+   If Err = 5941 Then
+         Set sty = ActiveDocument.Styles.Add("SatzNr", wdStyleTypeCharacter)
+         sty.Font.Superscript = True
+   End If
+   If Selection.Type = wdSelectionIP Then ActiveDocument.Select
+   Set rng = Selection.Range
+   txt = RxReplace(rng.Text, "(" + Chr(13) + "\([0-9]+[a-z]*\) )([A-ZÄÖÜ])", "$1####$2")
+   txt = RxReplace(txt, "^(\([0-9]+[a-z]*\) )([A-ZÄÖÜ])", "$1####$2")
+   txt2 = RxReplace(txt, "\. ([A-ZÄÖÜ])", ". ####$1")
+   rng.Text = txt2
+   rng.Select
+  Set rng = Selection.Range
+   Do While rng.Find.Execute(FindText:="####", _
+        Forward:=True, Format:=False, Wrap:=wdFindStop, ReplaceWith:="", Replace:=wdReplaceOne) = True
+        rng.MoveStart Unit:=wdCharacter, Count:=0
+        Set fld = rng.Fields.Add(Range:=rng, Type:=wdFieldEmpty, Text:="SEQ sn \n", PreserveFormatting:=True)
+        fld.Select
+        Selection.Range.style = "SatzNr"
+   Loop
+   ActiveDocument.Fields.Update
+   objUndo.EndCustomRecord
+End Sub
+
+Sub Satzummern_Loeschen()
+   Dim fld As Field
+   Dim rng As Range
+   If Selection.Type = wdSelectionIP Then ActiveDocument.Select
+   Set rng = Selection.Range
+   For Each fld In rng.Fields
+      If InStr(fld.Code, "sn") Then fld.Delete
+   Next
+End Sub
+
+Sub Normalize_Spaces()
+   With ActiveDocument.Content.Find
+      .ClearFormatting
+      .MatchWildcards = True
+      .Forward = True
+      .Wrap = wdFindContinue
+      .Text = "[" + ChrW(8194) + "-" + ChrW(8202) + " ]"
+      '.HitHighlight FindText:="[" + ChrW(8194) + "-" + ChrW(8202) + "]", MatchWildcards:=True
+      .Execute ReplaceWith:=" ", Replace:=wdReplaceAll
+   End With
 End Sub
