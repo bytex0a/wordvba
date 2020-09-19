@@ -38,14 +38,14 @@ Sub CheckWord()
    ElseIf (ActiveDocument.Words.Count < 5000) Or (dict("ADNAME") <> ActiveDocument.Name) Then BuildDatabase
    End If
    resultdict.RemoveAll
-   Selection.MoveLeft Unit:=wdCharacter, Count:=1
+   Selection.MoveLeft unit:=wdCharacter, Count:=1
    wort = Selection.Words(1)
    If wort = "" Then Exit Sub
-   Selection.MoveRight Unit:=wdCharacter, Count:=1
+   Selection.MoveRight unit:=wdCharacter, Count:=1
     
    i = 1
    For Each Item In dict.keys
-      If (LCase(left(Item, Len(Trim(wort)))) = LCase(Trim(wort))) And (LCase(Trim(wort)) <> LCase(Item)) Then
+      If (LCase(Left(Item, Len(Trim(wort)))) = LCase(Trim(wort))) And (LCase(Trim(wort)) <> LCase(Item)) Then
          resultdict.Add Item, i
          i = i + 1
       End If
@@ -55,7 +55,7 @@ Sub CheckWord()
       frmComplete.Show
    End If
    If resultdict.Count = 1 Then
-      Selection.MoveLeft Unit:=wdCharacter, Count:=1
+      Selection.MoveLeft unit:=wdCharacter, Count:=1
       Selection.Words(1).Select
       a = resultdict.keys
       Selection.Range.Text = a(0) + ADD_SPACE

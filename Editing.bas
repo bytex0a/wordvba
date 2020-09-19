@@ -34,7 +34,7 @@ Sub Randnummern_Erstellen()
       p.Range.Select
       Selection.Collapse wdCollapseStart
       Selection.Range.InsertBefore ("rz ")
-      Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdExtend
+      Selection.MoveRight unit:=wdWord, Count:=1, Extend:=wdExtend
       Selection.Range.InsertAutoText
    Next p
    Application.ScreenUpdating = True
@@ -150,7 +150,7 @@ Sub Satznummern_Erstellen()
   Set rng = Selection.Range
    Do While rng.Find.Execute(FindText:="####", _
         Forward:=True, Format:=False, Wrap:=wdFindStop, ReplaceWith:="", Replace:=wdReplaceOne) = True
-        rng.MoveStart Unit:=wdCharacter, Count:=0
+        rng.MoveStart unit:=wdCharacter, Count:=0
         Set fld = rng.Fields.Add(Range:=rng, Type:=wdFieldEmpty, Text:="SEQ sn \n", PreserveFormatting:=True)
         fld.Select
         Selection.Range.style = "SatzNr"

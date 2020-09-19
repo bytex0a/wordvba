@@ -278,9 +278,9 @@ End Sub
 
 Sub CharCode()                                   ' Zeigt Code des Zeichens links vom Cursor
    Dim c As String
-   Selection.MoveLeft Unit:=wdCharacter, Count:=1, Extend:=wdMove
+   Selection.MoveLeft unit:=wdCharacter, Count:=1, Extend:=wdMove
    c = Selection.Characters(1)
-   Selection.MoveRight Unit:=wdCharacter, Count:=1, Extend:=wdMove
+   Selection.MoveRight unit:=wdCharacter, Count:=1, Extend:=wdMove
    StatusBar = """" + c + """ = " & AscW(c) & " = " & Hex(AscW(c)) & "h" & " = U+" & right("0000" & CStr(Hex(AscW(c))), 4)
 End Sub
 
@@ -291,3 +291,82 @@ Sub SetParText(ByRef p As Paragraph, txt As String)
    rng.Text = txt
 End Sub
 
+Sub Mark_Paragraphs()
+' Marks the beginning and the end of a paragraph with 170 ª and 186 º
+   Dim p As Paragraph
+   Dim r As Range
+   Dim undo As UndoRecord
+   Set undo = Application.UndoRecord
+   undo.StartCustomRecord ("pared")
+   If Selection.Type = wdSelectionIP Then Set r = ActiveDocument.Range Else Set r = Selection.Range
+   For Each p In r.Paragraphs
+      p.Range.Select
+      Selection.Range.InsertBefore "ª"
+      Selection.MoveEnd unit:=wdCharacter, Count:=-1
+      Selection.InsertAfter "º"
+   Next p
+   r.Select
+   undo.EndCustomRecord
+End Sub
+
+Sub FindReplace(rng As Range, fnd As String, rpl As String)
+   Dim undo As UndoRecord
+   Set undo = Application.UndoRecord
+   With rng.Find
+      .ClearFormatting
+      .Replacement.ClearFormatting
+      .MatchWildcards = False
+      .Text = fnd
+      .Replacement.Text = rpl
+      .Execute Replace:=wdReplaceAll, Forward:=True, Wrap:=wdFindContinue
+   End With
+   undo.EndCustomRecord
+End Sub
+
+Sub DeMark_Paragraphs()
+' DeMarks the beginning and the end of a paragraph with 170 ª and 186 º
+  FindReplace rng:=ActiveDocument.Range, fnd:="ª", rpl:=""
+  FindReplace rng:=ActiveDocument.Range, fnd:="º", rpl:=""
+End Sub
+
+Private Sub testfind()
+  Dim dlg As Dialog
+  Set dlg = Dialogs(wdDialogEditReplace)
+  With dlg
+   .Find = "Stichwort"
+   .Replace = "^&"
+   .PatternMatch = 1
+   .Wrap = 1
+   .Show
+  End With
+  
+Function SimpleRegEx(re As String) As String
+   Replace("\d",re,"[0-9]")
+   Replace("\D",re,"[^0-9]")
+   Replace("\w",re," [a-zA-Z0-9_")
+   Replace("\W",re," [^a-zA-Z0-9_")
+   Replace("\a",re,"[a-z]")
+   Replace("\A",re,"[A-Z]")
+   Replace("\D",re,"[^0-9]")
+End Function
+
+Sub dollarHighlighter()
+    Set RegExp = New RegExp
+    Set Regexp2 = New RegExp
+    Dim objMatch As Match
+    Dim colMatches As MatchCollection
+    Dim myrange As Range
+    Dim offsetStart As Long
+    offsetStart = 0 ' Selection.Start
+
+    RegExp.Pattern = "bietet"
+    RegExp.Global = True
+    RegExp.IgnoreCase = True
+    Set colMatches = RegExp.Execute(ActiveDocument.Range.Text)   ' Execute search.
+    
+    For Each objMatch In colMatches   ' Iterate Matches collection.
+      Set myrange = ActiveDocument.Range(objMatch.FirstIndex + offsetStart, End:=offsetStart + objMatch.FirstIndex + objMatch.Length)
+      myrange.FormattedText.Text = "TEST"
+      myrange.ParagraphFormat.Shading.BackgroundPatternColor = wdColorBlueGray
+    Next
+End Sub

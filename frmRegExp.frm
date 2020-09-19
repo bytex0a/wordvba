@@ -57,7 +57,7 @@ Private Sub CheckBox2_Change()
       End If
       objUndo.EndCustomRecord
       Else
-         ActiveDocument.Undo
+         ActiveDocument.undo
    End If
 End Sub
 
@@ -77,7 +77,7 @@ End Sub
 
 Sub RemoveNamedHighlight()
 ' this just removes bright green highlights
-Selection.HomeKey Unit:=wdDocument
+Selection.HomeKey unit:=wdDocument
 With Selection.Find
   .Highlight = True
   Do While (.Execute(Forward:=True) = True) = True
@@ -108,7 +108,7 @@ Private Sub CommandButton2_Click()               ' Abbrechen
 End Sub
 
 Private Sub CommandButton3_Click()               ' Rückgängig
-   ActiveDocument.Undo
+   ActiveDocument.undo
 End Sub
 
 Private Sub CommandButton1_Click()               ' Ausführen

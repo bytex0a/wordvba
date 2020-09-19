@@ -35,7 +35,7 @@ Private Sub TextBox1_Change()
    ListBox1.Clear
    For Each cItem In colCmd
       st = TextBox1.Text
-      If left(st, 1) = " " Then bflag = True: st = Mid(st, 2) Else bflag = False
+      If Left(st, 1) = " " Then bflag = True: st = Mid(st, 2) Else bflag = False
       part = Split(st, " ")
       bfc = UCase(cItem)
       Select Case UBound(part)

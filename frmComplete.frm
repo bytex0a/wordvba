@@ -18,7 +18,7 @@ Private Sub ListBox1_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
    Set WshShell = CreateObject("WScript.Shell")
    If KeyCode = vbKeyEscape Then Me.Hide
    If (KeyCode = vbKeyReturn) Or (KeyCode = vbKeySpace) Then
-      Selection.MoveLeft Unit:=wdCharacter, Count:=1
+      Selection.MoveLeft unit:=wdCharacter, Count:=1
       Selection.Words(1).Select
       Selection.Range.Text = ListBox1.List(ListBox1.ListIndex) + ADD_SPACE
       Me.Hide
