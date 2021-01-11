@@ -193,6 +193,7 @@ Sub Kommandos()
                                                                    / 72 * 2.54, 2) & "cm / " & Application.Selection.Information(wdHorizontalPositionRelativeToPage) & "pt. (relative to Page)"
          MsgBox s
       Case "rds": Application.Run ("RedefineStyle")
+      Case "docprop": frmDP.Show
       End Select
    Else
       comarr = Split(com)
@@ -278,17 +279,17 @@ End Sub
 
 Sub CharCode()                                   ' Zeigt Code des Zeichens links vom Cursor
    Dim c As String
-   Selection.MoveLeft unit:=wdCharacter, Count:=1, Extend:=wdMove
+   Selection.MoveLeft Unit:=wdCharacter, Count:=1, Extend:=wdMove
    c = Selection.Characters(1)
-   Selection.MoveRight unit:=wdCharacter, Count:=1, Extend:=wdMove
+   Selection.MoveRight Unit:=wdCharacter, Count:=1, Extend:=wdMove
    StatusBar = """" + c + """ = " & AscW(c) & " = " & Hex(AscW(c)) & "h" & " = U+" & right("0000" & CStr(Hex(AscW(c))), 4)
 End Sub
 
 Sub SetParText(ByRef p As Paragraph, txt As String)
-   Dim rng As Range
-   Set rng = p.Range
-   rng.MoveEnd wdCharacter, 0
-   rng.Text = txt
+   Dim Rng As Range
+   Set Rng = p.Range
+   Rng.MoveEnd wdCharacter, 0
+   Rng.Text = txt
 End Sub
 
 Sub Mark_Paragraphs()
@@ -302,21 +303,21 @@ Sub Mark_Paragraphs()
    For Each p In r.Paragraphs
       p.Range.Select
       Selection.Range.InsertBefore "ª"
-      Selection.MoveEnd unit:=wdCharacter, Count:=-1
+      Selection.MoveEnd Unit:=wdCharacter, Count:=-1
       Selection.InsertAfter "º"
    Next p
    r.Select
    undo.EndCustomRecord
 End Sub
 
-Sub FindReplace(rng As Range, fnd As String, rpl As String)
+Sub FindReplace(Rng As Range, Fnd As String, rpl As String)
    Dim undo As UndoRecord
    Set undo = Application.UndoRecord
-   With rng.Find
+   With Rng.Find
       .ClearFormatting
       .Replacement.ClearFormatting
       .MatchWildcards = False
-      .Text = fnd
+      .Text = Fnd
       .Replacement.Text = rpl
       .Execute Replace:=wdReplaceAll, Forward:=True, Wrap:=wdFindContinue
    End With
@@ -325,8 +326,8 @@ End Sub
 
 Sub DeMark_Paragraphs()
 ' DeMarks the beginning and the end of a paragraph with 170 ª and 186 º
-  FindReplace rng:=ActiveDocument.Range, fnd:="ª", rpl:=""
-  FindReplace rng:=ActiveDocument.Range, fnd:="º", rpl:=""
+  FindReplace Rng:=ActiveDocument.Range, Fnd:="ª", rpl:=""
+  FindReplace Rng:=ActiveDocument.Range, Fnd:="º", rpl:=""
 End Sub
 
 Private Sub testfind()

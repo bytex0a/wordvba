@@ -231,3 +231,13 @@ Dim sty As style
       Debug.Print (sty.NameLocal)
    Next
 End Sub
+
+Sub Respace()
+   Dim p As Paragraph
+   r = 0.8
+   For Each p In ActiveDocument.Paragraphs
+      p.SpaceAfter = p.SpaceAfter * r
+      p.SpaceBefore = p.SpaceBefore * r
+   Next
+End Sub
+

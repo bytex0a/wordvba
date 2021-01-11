@@ -22,19 +22,19 @@ End Sub
 
 Sub Randnummern_Erstellen()
    Dim p As Paragraph
-   Dim rng As Range
+   Dim Rng As Range
    Dim objUndo As UndoRecord
    Set objUndo = Application.UndoRecord
    objUndo.StartCustomRecord ("Undo")
    RegisterListtemplateRZ                        'ListTemplate für Randziffern erstellen
    Application.ScreenUpdating = False
-   If Selection.Paragraphs.Count = 1 Then Set rng = ActiveDocument.Range Else Set rng = Selection.Range
-   For Each p In rng.Paragraphs
+   If Selection.Paragraphs.Count = 1 Then Set Rng = ActiveDocument.Range Else Set Rng = Selection.Range
+   For Each p In Rng.Paragraphs
       'If RxTest(p.Range.Text, "^\d+\r")   Then p.Range.Delete
       p.Range.Select
       Selection.Collapse wdCollapseStart
       Selection.Range.InsertBefore ("rz ")
-      Selection.MoveRight unit:=wdWord, Count:=1, Extend:=wdExtend
+      Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdExtend
       Selection.Range.InsertAutoText
    Next p
    Application.ScreenUpdating = True
@@ -50,7 +50,7 @@ Sub Randnummern_Loeschen()
    objUndo.StartCustomRecord ("Undo Remove Marginals")
    Application.ScreenUpdating = False
    For Each fr In ActiveDocument.Frames
-      If fr.Range.Paragraphs(1).style = "Rz" Then
+      If fr.Range.Paragraphs(1).style = "RzA" Then
          fr.Select
          Selection.Delete
       End If
@@ -93,20 +93,20 @@ Sub DeleteUnusedStyles()
 End Sub
 
 Sub LoopEdit()
-   Dim pat As String, rpl As String, style As String, rng As Range
+   Dim pat As String, rpl As String, style As String, Rng As Range
    Dim objUndo As UndoRecord, par As Paragraph
    Set objUndo = Application.UndoRecord
    objUndo.StartCustomRecord ("Edit Loop")
    If Selection.Type = wdSelectionIP Then
-      Set rng = ActiveDocument.Range
-   Else: Set rng = Selection.Range
+      Set Rng = ActiveDocument.Range
+   Else: Set Rng = Selection.Range
    End If
    pat = InputBox("Suchmuster eingeben" & vbCr & "<< für '" + lastpat + "'", "Suchmuster")
    If pat = "" Then Exit Sub
    If pat = "<<" Then pat = lastpat
    rpl = InputBox("Ersetzen mit", "")
    style = InputBox("Formatvorlage", "")
-   For Each par In rng.Paragraphs
+   For Each par In Rng.Paragraphs
       If RxTest(par.Range.Text, pat) Then
          If rpl = "#del" Then par.Range.Delete Else _
             If rpl <> "" Then par.Range.Text = RxReplace(par.Range.Text, pat, rpl)
@@ -127,7 +127,7 @@ End Sub
 
 
 Sub Satznummern_Erstellen()
-   Dim rng As Range
+   Dim Rng As Range
    Dim txt As String, txt2 As String
    Dim fld As Field
    Dim sty As style
@@ -141,17 +141,17 @@ Sub Satznummern_Erstellen()
          sty.Font.Superscript = True
    End If
    If Selection.Type = wdSelectionIP Then ActiveDocument.Select
-   Set rng = Selection.Range
-   txt = RxReplace(rng.Text, "(" + Chr(13) + "\([0-9]+[a-z]*\) )([A-ZÄÖÜ])", "$1####$2")
+   Set Rng = Selection.Range
+   txt = RxReplace(Rng.Text, "(" + Chr(13) + "\([0-9]+[a-z]*\) )([A-ZÄÖÜ])", "$1####$2")
    txt = RxReplace(txt, "^(\([0-9]+[a-z]*\) )([A-ZÄÖÜ])", "$1####$2")
    txt2 = RxReplace(txt, "\. ([A-ZÄÖÜ])", ". ####$1")
-   rng.Text = txt2
-   rng.Select
-  Set rng = Selection.Range
-   Do While rng.Find.Execute(FindText:="####", _
+   Rng.Text = txt2
+   Rng.Select
+  Set Rng = Selection.Range
+   Do While Rng.Find.Execute(FindText:="####", _
         Forward:=True, Format:=False, Wrap:=wdFindStop, ReplaceWith:="", Replace:=wdReplaceOne) = True
-        rng.MoveStart unit:=wdCharacter, Count:=0
-        Set fld = rng.Fields.Add(Range:=rng, Type:=wdFieldEmpty, Text:="SEQ sn \n", PreserveFormatting:=True)
+        Rng.MoveStart Unit:=wdCharacter, Count:=0
+        Set fld = Rng.Fields.Add(Range:=Rng, Type:=wdFieldEmpty, Text:="SEQ sn \n", PreserveFormatting:=True)
         fld.Select
         Selection.Range.style = "SatzNr"
    Loop
@@ -161,10 +161,10 @@ End Sub
 
 Sub Satzummern_Loeschen()
    Dim fld As Field
-   Dim rng As Range
+   Dim Rng As Range
    If Selection.Type = wdSelectionIP Then ActiveDocument.Select
-   Set rng = Selection.Range
-   For Each fld In rng.Fields
+   Set Rng = Selection.Range
+   For Each fld In Rng.Fields
       If InStr(fld.Code, "sn") Then fld.Delete
    Next
 End Sub
@@ -178,5 +178,47 @@ Sub Normalize_Spaces()
       .Text = "[" + ChrW(8194) + "-" + ChrW(8202) + " ]"
       '.HitHighlight FindText:="[" + ChrW(8194) + "-" + ChrW(8202) + "]", MatchWildcards:=True
       .Execute ReplaceWith:=" ", Replace:=wdReplaceAll
+   End With
+End Sub
+
+Sub RBB()
+  Dim Rng As Range
+  Dim Fnd As Boolean
+    Set Rng = ActiveDocument.Range
+    With Rng.Find
+        .ClearFormatting
+        .Execute FindText:="Rechtlicher Hinweis:", Forward:=True, _
+                 Format:=False, Wrap:=wdFindStop
+        Fnd = .Found
+    End With
+
+    If Fnd = True Then
+      Rng.Select
+      Selection.MoveEnd Unit:=wdParagraph, Count:=2
+      Selection.Range.Text = "#rbb"
+      Selection.MoveRight Unit:=wdWord, Count:=2
+      Selection.Range.InsertAutoText
+      Selection.InsertAfter vbCrLf
+    End If
+End Sub
+
+Private Sub MarkPar()
+   Dim p As Paragraph, i As Integer
+   i = 0
+   For Each p In ActiveDocument.Paragraphs
+      i = i + 1
+      If i = 10 Then Exit For
+      p.Range.InsertBefore (ChrW(2302))
+   Next
+End Sub
+
+Sub RemMark()
+   With ActiveDocument.Range.Find
+      .ClearFormatting
+      .Text = ChrW(2302)
+      .Replacement.Text = ""
+      .Forward = True
+      .Wrap = wdFindContinue
+      .Execute Replace:=wdReplaceAll
    End With
 End Sub

@@ -23,12 +23,17 @@ Sub ExportModules()
          Case vbext_ct_Document
          End Select
          vbc.Export MODULE_PATH + szFileName
+         VBE.VBProjects("Normal").VBComponents(2).Export FileName:="d:\dok\word\Makros\Complete.bas"
       End If
    Next vbc
 End Sub
 
 Sub ImportModules()
    Const PROJECT_NAME = 2 '"Normal"
+   If InputBox("(1) D:\Dok\Word\Makros" & vbCr & "(2) U:\Dokumente\Sonstiges\Word", "Bitte wählen", "1") = "1" Then
+      MODULE_PATH = "D:\dok\word\makros\"
+      Else: MODULE_PATH = "U:\Dokumente\Sonstiges\Word\"
+   End If
    Dim StrFile As String
    Dim proj As VBProject, vbc As VBComponent
    On Error Resume Next
